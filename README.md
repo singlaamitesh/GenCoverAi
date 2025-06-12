@@ -115,5 +115,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <p align="center">
-  Made with ❤️ by Your Name | <a href="https://github.com/singlaamitesh">GitHub</a>
+  Made with ❤️ by Amitesh Gupta | <a href="https://github.com/singlaamitesh">GitHub</a>
 </p>

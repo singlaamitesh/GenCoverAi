@@ -32,7 +32,30 @@ export default function LoginPage() {
         password,
       })
 
-      if (error) throw error
+      if (error) {
+        console.error('Login error:', error)
+        
+        // Handle specific error cases
+        if (error.message.includes('Email not confirmed')) {
+          toast.error(
+            <div>
+              <p className="font-medium">Email not confirmed</p>
+              <p className="text-sm">Please check your email and click the confirmation link before signing in.</p>
+            </div>
+          )
+        } else if (error.message.includes('Invalid login credentials')) {
+          toast.error(
+            <div>
+              <p className="font-medium">Invalid credentials</p>
+              <p className="text-sm">Please check your email and password, or confirm your email if you haven't already.</p>
+            </div>
+          )
+        } else {
+          toast.error(error.message || 'Login failed. Please try again.')
+        }
+        
+        return
+      }
 
       // Get the redirect URL from query params or default to '/'
       const searchParams = new URLSearchParams(window.location.search)
@@ -41,13 +64,16 @@ export default function LoginPage() {
       // Force refresh the session to ensure it's properly set
       await supabase.auth.refreshSession()
       
-      // Use router.push for client-side navigation instead of full page reload
+      // Use router.push for client-side navigation
       toast.success("Welcome back!")
       router.push(redirectTo)
-      router.refresh()
     } catch (error: any) {
       console.error('Login error:', error)
-      toast.error(error.message || 'Login failed. Please try again.')
+      
+      // Handle any unexpected errors
+      if (error.message && !error.message.includes('Invalid login credentials') && !error.message.includes('Email not confirmed')) {
+        toast.error(error.message || 'Login failed. Please try again.')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -151,7 +177,7 @@ export default function LoginPage() {
             <p className="text-neutral-600">
               Don't have an account?{" "}
               <Link
-                href="/auth/register"
+                href="/getstarted"
                 className="text-brand-600 hover:text-brand-700 font-semibold transition-colors"
               >
                 Create Account

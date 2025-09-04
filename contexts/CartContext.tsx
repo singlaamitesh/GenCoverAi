@@ -38,10 +38,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadCart = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
           // In a real app, you might want to sync with the server here
-          const savedCart = localStorage.getItem(`cart_${user.id}`);
+          const savedCart = localStorage.getItem(`cart_${session.user.id}`);
           if (savedCart) {
             setItems(JSON.parse(savedCart));
           }
@@ -60,9 +60,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const saveCart = async () => {
       if (isLoading) return;
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          localStorage.setItem(`cart_${user.id}`, JSON.stringify(items));
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          localStorage.setItem(`cart_${session.user.id}`, JSON.stringify(items));
         }
       } catch (error) {
         console.error('Error saving cart:', error);

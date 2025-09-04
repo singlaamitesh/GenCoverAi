@@ -26,7 +26,7 @@ export default function GalleryPage() {
       name: "Sunset Mountains",
       category: "nature",
       price: 299,
-      image: "/placeholder.svg?height=400&width=300",
+      image: "/sunset.png",
       likes: 234,
     },
     {
@@ -34,7 +34,7 @@ export default function GalleryPage() {
       name: "Abstract Waves",
       category: "abstract",
       price: 349,
-      image: "/placeholder.svg?height=400&width=300",
+      image: "/abstract.png",
       likes: 189,
     },
     {
@@ -42,7 +42,7 @@ export default function GalleryPage() {
       name: "Geometric Pattern",
       category: "geometric",
       price: 279,
-      image: "/placeholder.svg?height=400&width=300",
+      image: "/geomatric.png",
       likes: 156,
     },
     {
@@ -50,7 +50,7 @@ export default function GalleryPage() {
       name: "Minimal Lines",
       category: "minimalist",
       price: 249,
-      image: "/placeholder.svg?height=400&width=300",
+      image: "/minimalline.png",
       likes: 298,
     },
     {
@@ -58,7 +58,7 @@ export default function GalleryPage() {
       name: "Vintage Floral",
       category: "vintage",
       price: 329,
-      image: "/placeholder.svg?height=400&width=300",
+      image: "/Vintage Floral.png",
       likes: 167,
     },
     {
@@ -66,7 +66,7 @@ export default function GalleryPage() {
       name: "Ocean Depths",
       category: "nature",
       price: 319,
-      image: "/placeholder.svg?height=400&width=300",
+      image: "/Ocean Depth.png",
       likes: 203,
     },
   ]
@@ -85,7 +85,16 @@ export default function GalleryPage() {
         name: design.name,
         price: design.price,
         image: design.image,
-        phoneModel: "Universal",
+        phoneModel: {
+          id: "universal",
+          name: "Universal",
+          image: "/placeholder.svg",
+          cases: [],
+          brand: "universal",
+          model: "universal",
+          modelName: "Universal",
+          caseType: "standard"
+        },
       },
     })
     toast.success("Added to cart!")
@@ -98,7 +107,7 @@ export default function GalleryPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl lg:text-5xl font-bold text-neutral-900 mb-4">
+          <h1 className="text-4xl lg:text-5xl font-bold text-neutral-900 mb-4 mx-auto">
             Design <span className="gradient-text">Gallery</span>
           </h1>
           <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
@@ -142,7 +151,7 @@ export default function GalleryPage() {
           {filteredDesigns.map((design, index) => (
             <div
               key={design.id}
-              className="modern-card p-6 group animate-scale-in"
+              className="modern-card p-6 group animate-scale-in cursor-default"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="aspect-[3/4] bg-neutral-100 rounded-xl mb-4 overflow-hidden relative">
@@ -172,7 +181,10 @@ export default function GalleryPage() {
               </div>
 
               <button
-                onClick={() => addToCart(design)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  addToCart(design)
+                }}
                 className="w-full premium-button flex items-center justify-center gap-2"
               >
                 <ShoppingCart className="w-5 h-5" />

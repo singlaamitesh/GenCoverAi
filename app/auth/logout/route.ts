@@ -36,16 +36,7 @@ export async function GET(request: Request) {
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
     await supabase.auth.signOut();
     
-    // Add cache control headers
-    response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
-    response.headers.set('Pragma', 'no-cache');
-    
-    // Add a unique query parameter to prevent caching
-    const redirectUrl = new URL(redirectTo, request.url);
-    redirectUrl.searchParams.set('loggedOut', Date.now().toString());
-    
-    // Redirect to the home page
-    return NextResponse.redirect(redirectUrl);
+    return response;
   } catch (error) {
     console.error('Error during sign out:', error);
     return NextResponse.redirect(new URL('/', request.url));

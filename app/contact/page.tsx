@@ -69,7 +69,7 @@ export default function ContactPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl lg:text-5xl font-bold text-neutral-900 mb-6">
+          <h1 className="text-4xl lg:text-5xl font-bold text-neutral-900 mb-6 mx-auto">
             Get in <span className="gradient-text">Touch</span>
           </h1>
           <p className="text-xl text-neutral-600 max-w-2xl mx-auto">

@@ -38,7 +38,7 @@ export default function ImageGenerator() {
   const [isHovered, setIsHovered] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const { generateImage, isLoading, error, imageUrl, imagePath, reset } = useImageGeneration();
+  const { generateImage, isLoading, error, imageUrl, reset } = useImageGeneration();
   const { dispatch } = useCart();
   const supabase = createClientComponentClient();
   const router = useRouter();
@@ -93,18 +93,18 @@ export default function ImageGenerator() {
     setSaveError(null);
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        router.push('/login');
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session?.user) {
+        router.push('/auth/login');
         return;
       }
-      
+
       const { data, error } = await supabase
         .from('designs')
         .insert([
           {
-            user_id: user.id,
+            user_id: session.user.id,
             image_url: imageUrl,
             prompt: prompt,
             style: stylePreset,

@@ -40,7 +40,7 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      // First, sign up the user
+      // Sign up the user (this will send confirmation email if enabled)
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -51,90 +51,31 @@ export default function RegisterPage() {
 
       if (signUpError) throw signUpError
 
-      // Sign in the user immediately
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
-      });
-
-      if (signInError) throw signInError;
-
-      // Create or update user profile
-      if (signInData.user) {
-        console.log('Creating/updating profile for user:', signInData.user.id);
+      // Check if user needs to confirm email
+      if (signUpData.user && !signUpData.session) {
+        // Email confirmation is required
+        toast.success(
+          <div>
+            <p className="font-medium">Registration successful!</p>
+            <p className="text-sm">Please check your email to confirm your account.</p>
+          </div>,
+          {
+            duration: 5000,
+          }
+        )
         
-        const profileData = {
-          id: signInData.user.id,
-          full_name: formData.name,
-          updated_at: new Date().toISOString(),
-        };
+        // Redirect to check email page
+        setTimeout(() => {
+          router.push('/auth/check-email')
+        }, 2000)
+      } else if (signUpData.session) {
+        // No email confirmation required, user is signed in immediately
+        toast.success("Welcome to GenCover! Your account has been created.")
         
-        console.log('Profile data to upsert:', profileData);
-        
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .upsert(profileData)
-          .select()
-          .single();
-
-        console.log('Profile upsert result:', { profile, profileError });
-        
-        if (profileError) {
-          console.error('Profile upsert error:', profileError);
-          throw new Error(`Failed to create/update profile: ${profileError.message}`);
-        }
-
-        // Force refresh the session to ensure it's properly set
-        await supabase.auth.refreshSession();
-        
-        // Store user data in localStorage
-        if (signInData.session) {
-          localStorage.setItem('supabase.auth.token', signInData.session.access_token);
-          localStorage.setItem('supabase.user', JSON.stringify(signInData.user));
-        }
-
-        // Send welcome email
-        try {
-          await sendEmail({
-            to: formData.email,
-            subject: 'Welcome to GenCover!',
-            html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h1 style="color: #4F46E5;">Welcome to GenCover, ${formData.name}!</h1>
-                <p>Thank you for registering with us. We're excited to have you on board!</p>
-                <p>Please check your email to complete your registration and verify your account.</p>
-                <p>If you don't see the email, please check your spam folder.</p>
-                <a href="${window.location.origin}" style="display: inline-block; padding: 10px 20px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px;">Go to Home Page</a>
-                <p style="margin-top: 30px; font-size: 12px; color: #666;">
-                  If you didn't create an account, please ignore this email.
-                </p>
-              </div>
-            `,
-          });
-          
-          // Show success message with email instructions
-          toast.success(
-            <div>
-              <p className="font-medium">Account created successfully!</p>
-              <p className="text-sm">Please check your email to verify your account.</p>
-            </div>,
-            {
-              duration: 10000,
-            }
-          );
-
-          // Redirect to home page after a short delay to show the message
-          setTimeout(() => {
-            window.location.href = '/';
-          }, 1500);
-        } catch (emailError) {
-          console.error('Failed to send welcome email:', emailError);
-          toast.error("Account created, but we couldn't send the welcome email. Please contact support.");
-          // Still redirect to home page even if email fails
-          setTimeout(() => {
-            window.location.href = '/';
-          }, 1500);
-        }
+        // Redirect to dashboard
+        setTimeout(() => {
+          router.push('/dashboard')
+        }, 2000)
       }
     } catch (error: any) {
       console.error('Registration error:', error)

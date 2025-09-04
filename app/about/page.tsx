@@ -27,21 +27,16 @@ export default function AboutPage() {
 
   const team = [
     {
-      name: "Arjun Sharma",
+      name: "Amitesh Gupta",
       role: "CEO & Founder",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "/2AF91BED-65EC-456B-8133-7ED5CD81794C_1_105_c.jpeg?height=300&width=300",
       bio: "Passionate about combining technology with creativity",
     },
+    
     {
-      name: "Priya Patel",
-      role: "Head of Design",
-      image: "/placeholder.svg?height=300&width=300",
-      bio: "Leading our AI design innovation team",
-    },
-    {
-      name: "Rahul Kumar",
+      name: "Amitesh Gupta",
       role: "CTO",
-      image: "/placeholder.svg?height=300&width=300",
+      image: "/2AF91BED-65EC-456B-8133-7ED5CD81794C_1_105_c.jpeg?height=300&width=300",
       bio: "Building the future of personalized manufacturing",
     },
   ]
@@ -53,7 +48,7 @@ export default function AboutPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl lg:text-5xl font-bold text-neutral-900 mb-6">
+          <h1 className="text-4xl lg:text-5xl font-bold text-neutral-900 mb-6 mx-auto">
             About <span className="gradient-text">GenCover</span>
           </h1>
           <p className="text-xl text-neutral-600 max-w-3xl mx-auto leading-relaxed">
@@ -83,7 +78,7 @@ export default function AboutPage() {
           </div>
           <div className="relative">
             <div className="aspect-square bg-gradient-to-br from-brand-100 to-accent-100 rounded-3xl overflow-hidden">
-              <img src="/placeholder.svg?height=500&width=500" alt="Our story" className="w-full h-full object-cover" />
+              <img src="/Gemini_Generated_Image_tfvdhjtfvdhjtfvd.png?height=500&width=500" alt="Our story" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>

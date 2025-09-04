@@ -1,19 +1,18 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { supabase } from "@/lib/supabase/client"
 import { Loader2, CheckCircle2, XCircle } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 
-export default function ConfirmPage() {
+function ConfirmPageContent() {
   const [loading, setLoading] = useState(true)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const searchParams = useSearchParams()
   const router = useRouter()
-  const supabase = createClientComponentClient()
 
   useEffect(() => {
     const verifyEmail = async () => {
@@ -35,6 +34,31 @@ export default function ConfirmPage() {
 
         if (error) throw error
 
+        // Get the current session after verification
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        
+        if (sessionError) throw sessionError
+
+        // Create user profile if session exists
+        if (session?.user) {
+          const profileData = {
+            id: session.user.id,
+            full_name: session.user.user_metadata?.full_name || '',
+            updated_at: new Date().toISOString(),
+          };
+          
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .upsert(profileData)
+            .select()
+            .single();
+
+          if (profileError) {
+            console.error('Profile creation error:', profileError);
+            // Don't throw here, profile creation failure shouldn't block login
+          }
+        }
+
         setSuccess(true)
         toast.success("Email verified successfully!")
         // Redirect to dashboard after 3 seconds
@@ -43,14 +67,14 @@ export default function ConfirmPage() {
         }, 3000)
       } catch (err) {
         console.error("Email verification error:", err)
-        setError(err.message || "Failed to verify email. The link may have expired.")
+        setError(err instanceof Error ? err.message : "Failed to verify email. The link may have expired.")
       } finally {
         setLoading(false)
       }
     }
 
     verifyEmail()
-  }, [searchParams, router, supabase])
+  }, [searchParams, router])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-50 via-white to-accent-50/30 p-4">
@@ -87,3 +111,25 @@ export default function ConfirmPage() {
       </div>
     </div>
   )
+}
+
+export default function ConfirmPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-50 via-white to-accent-50/30 p-4">
+        <div className="w-full max-w-md relative z-10">
+          <div className="modern-card p-8 animate-slide-up backdrop-blur-sm bg-white/80">
+            <div className="text-center mb-8">
+              <div className="flex flex-col items-center">
+                <Loader2 className="h-12 w-12 animate-spin text-brand-500 mb-4" />
+                <p className="text-neutral-600">Loading...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <ConfirmPageContent />
+    </Suspense>
+  )
+}

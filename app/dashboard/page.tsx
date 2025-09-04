@@ -98,23 +98,21 @@ export default function DashboardPage() {
         setLoading(true)
         
         // Get current user
-        const { data: { user } } = await supabase.auth.getUser()
-        
-        if (!user) {
+        const { data: { session } } = await supabase.auth.getSession()
+
+        if (!session?.user) {
           router.push('/auth/login')
           return
-        }
-
-        // Fetch user profile
+        }        // Fetch user profile
         const { data: profileData } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', user.id)
+          .eq('id', session.user.id)
           .single()
 
         setProfile({
-          full_name: profileData?.full_name || user.email?.split('@')[0] || 'User',
-          email: user.email || '',
+          full_name: profileData?.full_name || session.user.email?.split('@')[0] || 'User',
+          email: session.user.email || '',
           avatar_url: profileData?.avatar_url
         })
 
@@ -122,7 +120,7 @@ export default function DashboardPage() {
         const { data: designsData } = await supabase
           .from('designs')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', session.user.id)
           .order('created_at', { ascending: false })
 
         setDesigns(designsData || [])
@@ -134,7 +132,7 @@ export default function DashboardPage() {
             *,
             order_items (*)
           `)
-          .eq('user_id', user.id)
+          .eq('user_id', session.user.id)
           .order('created_at', { ascending: false })
 
         setOrders(ordersData || [])
@@ -410,7 +408,7 @@ export default function DashboardPage() {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {new Date(order.createdAt).toLocaleDateString()}
+                            {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             ₹{order.amount}
@@ -474,7 +472,7 @@ export default function DashboardPage() {
                         </div>
                         <p className="text-gray-600 mb-2">{order.phoneModel}</p>
                         <p className="text-sm text-gray-500">
-                          Ordered on {new Date(order.createdAt).toLocaleDateString()}
+                          Ordered on {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
                         </p>
                         <p className="text-lg font-semibold text-gray-900 mt-2">₹{order.amount}</p>
                         <div className="mt-4 flex gap-2">

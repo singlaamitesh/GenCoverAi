@@ -5,8 +5,8 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const requestUrl = new URL(request.url);
-    const cookieStore = cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const cookieStore = await cookies();
+    const supabase = createRouteHandlerClient({ cookies });
     
     // Sign out from Supabase
     const { error } = await supabase.auth.signOut();
@@ -23,8 +23,8 @@ export async function POST(request: Request) {
     const response = NextResponse.redirect(requestUrl.origin, { status: 303 });
     
     // Delete all Supabase auth cookies
-    const cookieNames = cookieStore.getAll().map(cookie => cookie.name);
-    cookieNames.forEach(cookieName => {
+    const cookieNames = (await cookieStore.getAll()).map((cookie: any) => cookie.name);
+    cookieNames.forEach((cookieName: string) => {
       if (cookieName.startsWith('sb-')) {
         response.cookies.delete(cookieName);
       }

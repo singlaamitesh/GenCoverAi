@@ -59,16 +59,16 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
           router.push('/auth/login');
           return;
         }
         const userProfile = {
-          id: user.id,
-          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-          email: user.email || '',
-          created_at: user.created_at || new Date().toISOString()
+          id: session.user.id,
+          full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User',
+          email: session.user.email || '',
+          created_at: session.user.created_at || new Date().toISOString()
         };
         setProfile(userProfile);
         setName(userProfile.full_name || '');
@@ -90,8 +90,8 @@ export default function ProfilePage() {
     }
     setSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) throw new Error('Not authenticated');
       const { error } = await supabase.auth.updateUser({
         data: { full_name: name.trim() }
       });
